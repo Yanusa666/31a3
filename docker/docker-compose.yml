@@ -1,0 +1,40 @@
+version: "3.2"
+services:
+  crud-postgres:
+    image: postgres:14.1
+    container_name: 'crud-postgres'
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - $PWD/postgres/init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+      - $PWD/postgres/migrations:/var/lib/migrations
+    environment:
+      POSTGRES_DB: crud
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    networks:
+      mynet:
+
+  crud-mongo:
+    image: mongo:4.4.12-rc1-focal
+    container_name: 'crud-mongo'
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - $PWD/mongo/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: username
+      MONGO_INITDB_ROOT_PASSWORD: password
+    #      MONGO_INITDB_ROOT_DATABASE: root-db
+    networks:
+      mynet:
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.1.0.0/24
